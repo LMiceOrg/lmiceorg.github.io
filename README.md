@@ -10,5 +10,7 @@ Web site of LMiceOrg
 
 * 图标：
 
-![LOGO(gray)](xmjson/logo/xmjson-color.png){width=320}![LOGO(gray)](xmjson/logo/xmjson.png){width=320}
+[LOGO](xmjson/logo/xmjson-color.png)
+
+[LOGO(gray)](xmjson/logo/xmjson.png){width=320}
 
