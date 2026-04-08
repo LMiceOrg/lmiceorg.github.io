@@ -7,6 +7,9 @@ Web site of LMiceOrg
 * 路线图：
 
 [开发与发布计划](xmjson/Roadmap.md) 
+
+* 测试环境:
+  
 [解析器 在线测试](xmjson/test_parser2.html)   
 
 * 图标：
@@ -17,4 +20,4 @@ Web site of LMiceOrg
 
 * 参考样式
 
-[语法样式](xmjson/simple.xls)
+[语法样式](xmjson/simple.lxs)
