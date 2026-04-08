@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="icon" type="image/x-icon" href="/logo/logo.ico">
+    <title>xmJSON-灵米冰核</title>
+    <style>body {
+  font-family: arial;
+  margin: 0;
+  padding: none;
+}
+
+.emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: inline-block; }
+div.emscripten { text-align: center; }
+div.emscripten_border { border: 1px solid black; }
+/* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+canvas.emscripten { border: 0px none; background-color: black; }
+
+#xmjson_logo {
+  display: inline-block;
+  margin: 0;
+  padding: 6px;
+}
+
+.spinner {
+  height: 30px;
+  width: 30px;
+  margin: 0;
+  margin-top: 20px;
+  margin-left: 20px;
+  display: inline-block;
+  vertical-align: top;
+
+  -webkit-animation: rotation .8s linear infinite;
+  -moz-animation: rotation .8s linear infinite;
+  -o-animation: rotation .8s linear infinite;
+  animation: rotation 0.8s linear infinite;
+
+  border-left: 5px solid rgb(235, 235, 235);
+  border-right: 5px solid rgb(235, 235, 235);
+  border-bottom: 5px solid rgb(235, 235, 235);
+  border-top: 5px solid rgb(120, 120, 120);
+
+  border-radius: 100%;
+  background-color: rgb(189, 215, 46);
+}
+
+@-webkit-keyframes rotation {
+  from {-webkit-transform: rotate(0deg);}
+  to {-webkit-transform: rotate(360deg);}
+}
+@-moz-keyframes rotation {
+  from {-moz-transform: rotate(0deg);}
+  to {-moz-transform: rotate(360deg);}
+}
+@-o-keyframes rotation {
+  from {-o-transform: rotate(0deg);}
+  to {-o-transform: rotate(360deg);}
+}
+@keyframes rotation {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
+}
+
+#status {
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 30px;
+  margin-left: 20px;
+  font-weight: bold;
+  color: rgb(232, 27, 34);
+}
+
+#banner {
+ width: 70%;
+ display: inline-block;
+  margin-top: 40px;
+  margin-left: 40px;
+  padding: 6px;
+  vertical-align:top;
+}
+#progress {
+  height: 20px;
+  width: 300px;
+}
+
+#controls {
+  display: inline-block;
+  float: right;
+  vertical-align: top;
+  margin-top: 30px;
+  margin-right: 20px;
+}
+
+#output, #fileContext {
+  width: 100%;
+  height: 200px;
+  margin: 0 auto;
+  margin-top: 10px;
+  border-left: 0px;
+  border-right: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  display: block;
+  background-color: rgba(1, 83, 8, 0.785);
+  color: white;
+  font-family: 'Lucida Console', Monaco, monospace;
+  outline: none;
+}
+
+#fileContext {
+    background-color: rgba(6, 1, 83, 0.785);
+}
+</style>
+  </head>
+  <body>
+    <a href="http://lmiceorg.github.io"><img id="xmjson_logo" src="logo/xmjson-color.png" height="160px"></a>
+
+    <div class="spinner" id='spinner'></div>
+    <div class="emscripten" id="banner">
+        
+        <div style="font-size: 40px;">xmJSON - eXtreme Memory JSON Parser</div>
+        <div style="font-size: 18px;">高性能、零拷贝、内存优化的JSON解析库，专为高频数据访问与网络分发场景设计。</div>
+        </div>
+    <div class="emscripten" id="status"></div>
+
+    <span id='controls'>
+      <span><input type="checkbox" id="resize">Resize canvas</span>
+      <span><input type="checkbox" id="pointerLock" checked>Lock/hide mouse pointer &nbsp;&nbsp;&nbsp;</span>
+      <span><input type="button" value="Fullscreen" onclick="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
+                                                                                document.getElementById('resize').checked)">
+      </span>
+    </span>
+
+    <div class="emscripten">
+      <progress value="0" max="100" id="progress" hidden=1></progress>
+    </div>
+
+    <div class="emscripten_border">
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+    </div>
+    <textarea id="output" rows="8"></textarea>
+    <form>
+        <input id="upfile" type="file" value="上载文件" onchange="handleFiles(this.files);">
+        <input type="button" onclick="resetBuff();" value="清除">
+        <input type="button" value="解析" onclick="callchange();">
+    </form>
+        <textarea id="fileContext" ondragend="handleFiles(this.files);"></textarea>
+        <script>
+    function resetBuff() {
+        document.getElementById('output').value = "";
+        //document.getElementById('fileContext').value="";
+    }
+    function handleFiles(files)
+    {
+      if(files.length){
+        let file = files[0];
+        let reader = new FileReader();
+        reader.onload = function(){
+          document.getElementById('fileContext').value = this.result;
+          callchange();
+        };
+        reader.readAsText(file);
+       }
+    }
+    
+    function callchange() {
+        var txt = document.getElementById('fileContext').value;
+        var ptr = stringToNewUTF8(txt);
+        // var ptr = allocate(intArrayFromString(txt), ALLOC_NORMAL);
+        Module['_parse_xmjson'](ptr);
+        _free(ptr);
+    }
+        </script>
+    <script type='text/javascript'>
+      var statusElement = document.getElementById('status');
+      var progressElement = document.getElementById('progress');
+      var spinnerElement = document.getElementById('spinner');
+      var canvasElement = document.getElementById('canvas');
+      var outputElement = document.getElementById('output');
+      if (outputElement) outputElement.value = ''; // clear browser cache
+
+      // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+      // application robust, you may want to override this behavior before shipping!
+      // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+      canvasElement.addEventListener('webglcontextlost', (e) => {
+        alert('WebGL context lost. You will need to reload the page.');
+        e.preventDefault();
+      }, false);
+
+      /*隐藏*/
+      document.getElementById("controls").style.display='none';
+      canvasElement.style.display = 'none';
+
+      var Module = {
+        printErr(...args) {
+            
+            // if(statusElement) {
+                var text = args[0];
+                // outputElement  `<span color="red">` + text + `</span>`;
+                
+                Module.setStatus(text);
+            // }
+        },
+        print(...args) {
+          
+          // These replacements are necessary if you render to raw HTML
+          //text = text.replace(/&/g, "&amp;");
+          //text = text.replace(/</g, "&lt;");
+          //text = text.replace(/>/g, "&gt;");
+          //text = text.replace('\n', '<br>', 'g');
+          if (outputElement) {
+            var text = args.join(' ');
+            outputElement.value += text + "\n";
+            outputElement.scrollTop = outputElement.scrollHeight; // focus on bottom
+          }
+        },
+        canvas: canvasElement,
+        setStatus(text) {
+            if(text.length > 0)
+                document.getElementById('status').innerHTML = text;
+            progressElement.value = null;
+                progressElement.max = null;
+                progressElement.hidden = true;
+                spinnerElement.style.display = 'none';
+        },
+        totalDependencies: 0,
+        monitorRunDependencies(left) {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
+      };
+    //   Module.setStatus('Downloading...');
+      window.onerror = (event) => {
+        // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+        Module.setStatus('Exception thrown, see JavaScript console');
+        spinnerElement.style.display = 'none';
+        Module.setStatus = (text) => {
+          if (text) console.error('[post-exception status] ' + text);
+        };
+      };
+    </script>
+    <script async type="text/javascript" src="test_parser.js"></script>
+  </body>
+</html>

@@ -1,0 +1,40 @@
+#lxm:1.1
+#id:abb
+#author: lmice
+#date: 2024-8
+#import: model.lxs
+
+ // root object  welcome
+/**
+注意: 这时多行注释 sdf 
+。。。
+ */   /*aa*/
+<root> 
+
+// root object content
+{ // empty object
+“hehao”:1，
+val:{//no error
+key1/*mcomment*/:/*mcomment2*/val1/*mcomment3*/,
+key2:val2,
+}
+}
+
+<second_object>
+{
+    _311：1，
+   'id':<hi>0x12,
+    user:"hello
+    
+    world",
+    file:a.lxs,
+    //check
+    data:[{'id':1}，[1,2,3]/*comm array*/,《aa》{5：1}],
+    0x1234:
+    'hello\, world',
+    // this is a zhushi
+        
+     "key":"name\"}{}" //hello
+     arr：【去，我，额，人，他】
+    
+}
